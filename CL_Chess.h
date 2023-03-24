@@ -114,4 +114,3 @@ int     ply;
 
 HISTORY hist[6000];  // Game length < 6000
 int     hdp;         // Current move order 
-

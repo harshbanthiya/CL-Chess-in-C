@@ -582,13 +582,13 @@ int main()
         dest = user_input[2] - 'a';
         dest += 8 * (8 - (user_input[3] - '0'));
 
-        // Print Extracted squares 
-        printf("\nfrom: %d to: %d \n", from, dest);
+        // // Print Extracted squares 
+        // printf("\nfrom: %d to: %d \n", from, dest);
 
         // Lets set ply to zero and generate all the moves 
         ply = 0;
         move_count = generate_all_moves(side, moveBuffer);
-        printf("\n move_counts generated : %d\n", move_count);
+        // printf("\n move_counts generated : %d\n", move_count);
 
         // Loop through the moves to see if it is legal 
         for (i = 0; i < move_count; i++)
