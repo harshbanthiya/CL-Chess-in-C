@@ -187,6 +187,24 @@ int generate_all_moves(int current_side, MOVE *pBuf)
     return movecount;
 }
 
+// Main - Brain function. I guess
+int eval()
+{
+    int     value_piece[6] = {VALUE_PAWN, VALUE_KNIGHT, VALUE_BISHOP, VALUE_ROOK, VALUE_QUEEN, VALUE_KING};
+    int     i, score = 0;
+    
+    for (i = 0; i < 64; i++) // the whole board
+    {
+        if (color[i] == WHITE)
+            score += value_piece[board[i]];
+        else if (color[i] == BLACK)
+            score -= value_piece[board[i]];
+    }
+    if (side == WHITE)
+        return score;
+    return -score;
+}
+
 int make_move(MOVE m)
 {
     int         r;
@@ -244,9 +262,83 @@ void take_back(void) // Undo the move made by make_move
         board[hist[hdp].m.from] = PAWN;
 }
 
+// This is basic minmax search algorithm with alpha beta pruning 
+/*
+    It works by exploring the possible moves of a game, and assigning a score to each possible outcome. 
+    For each level of the search tree, the algorithm alternates between maximizing and minimizing the score, 
+    as if the two players are taking turns.
+    Alpha-beta pruning is a technique used to optimize the minimax algorithm, by reducing the number of nodes that need to be explored. 
+    It works by maintaining two values: alpha, which represents the maximum score that the maximizer player can achieve so far, and beta, 
+    which represents the minimum score that the minimizer player can achieve so far. As the algorithm explores the nodes of the game tree, 
+    it updates the values of alpha and beta accordingly. If the algorithm finds a node that has a score worse than the current alpha or beta value, 
+    it stops exploring the subtree rooted at that node, because it knows that this subtree will not affect the final result. 
+*/
+
+int search(int alpha, int beta, int depth, MOVE *pBestMove)
+{
+    int     i, value, havemove, move_count;
+    MOVE    moveBuffer[200], tmpMove;
+
+    nodes++;    // Visit node and count it
+    havemove = 0;
+    pBestMove->type = MOVE_TYPE_NONE;
+    move_count = generate_all_moves(side, moveBuffer); // Generate all moves from current position
+
+    // Loop through the moves 
+    for (i = 0; i < move_count; i++)
+    {
+        if (!make_move(moveBuffer[i]))
+        {
+            take_back();
+            continue ;
+        }
+        havemove = 1;
+        if (depth - 1 > 0) // If depth is still present continue to search deeper
+            value = -search(-beta, -alpha, depth - 1, &tmpMove); // recursively calling with different alpha and beta 
+        else 
+            value = eval();
+        take_back();
+        if (value > alpha)
+        {
+            // this move is so good, it causes a cutoff
+            if (value >= beta)
+                return (beta);
+            alpha = value;
+            *pBestMove = moveBuffer[i]; // so far current move is the best move for the current position
+
+        }
+    }
+    if (!havemove) // If no legal moves left that is either checkmate or stalemate
+    {
+        if (is_in_check(side))
+            return -MATE + ply; // add ply to find longest path to lose or shortest path to win
+        else 
+            return 0;
+    }
+    return alpha;
+}
+
+
+// Just calls the search function and prints the results
 MOVE computer_think(int max_depth)
 {
+    MOVE    m;
+    int     score;
 
+    // Reset some values before searching
+    ply = 0;
+    nodes = 0;
+    // search using algo
+    score = search(-MATE, MATE, max_depth, &m);
+    printf("Search result: move = %c%d%c%d; nodes = %d, score = %d\n",
+            'a' + COL(m.from),
+            8 - ROW(m.from),
+            'a' + COL(m.dest),
+            8 - ROW(m.dest),
+            nodes,
+            score
+    );
+    return m;
 }
 
 void init_board(void)
