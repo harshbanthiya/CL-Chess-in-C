@@ -187,6 +187,67 @@ int generate_all_moves(int current_side, MOVE *pBuf)
     return movecount;
 }
 
+int make_move(MOVE m)
+{
+    int         r;
+    hist[hdp].m = m;
+    hist[hdp].cap = board[m.dest];
+    board[m.dest] = board[m.from];
+    board[m.from] = EMPTY;
+    color[m.dest] = color[m.from];
+    color[m.from] = EMPTY;
+    if (m.type >= MOVE_TYPE_PROMOTION_TO_QUEEN) // Promotion
+    {
+        switch(m.type)
+        {
+            case MOVE_TYPE_PROMOTION_TO_QUEEN:
+                board[m.dest] = QUEEN;
+                break ;
+
+            case MOVE_TYPE_PROMOTION_TO_ROOK:
+                board[m.dest] = ROOK;
+                break ;
+
+            case MOVE_TYPE_PROMOTION_TO_BISHOP:
+                board[m.dest] = BISHOP;
+                break ;
+
+            case MOVE_TYPE_PROMOTION_TO_KNIGHT:
+                board[m.dest] = KNIGHT;
+                break ;
+            
+            default:
+                puts("Impossible to get here.!");
+                assert(0);
+        }
+    }
+    ply++;
+    hdp++;
+    r = !is_in_check(side);
+    side = (WHITE + BLACK) - side; // After making the move, we need to give the chance to the opponent
+    return r; 
+}
+
+void take_back(void) // Undo the move made by make_move 
+{
+    side = (WHITE + BLACK) - side;
+    hdp--;
+    ply--;
+    board[hist[hdp].m.from] = board[hist[hdp].m.dest];
+    board[hist[hdp].m.dest] = hist[hdp].cap;
+    color[hist[hdp].m.from] = side;
+    if (hist[hdp].cap != EMPTY)
+        color[hist[hdp].m.dest] = (WHITE + BLACK) - side;
+    else 
+        color[hist[hdp].m.dest] = EMPTY;
+    if (hist[hdp].m.type >= MOVE_TYPE_PROMOTION_TO_QUEEN)
+        board[hist[hdp].m.from] = PAWN;
+}
+
+MOVE computer_think(int max_depth)
+{
+
+}
 
 void init_board(void)
 {
@@ -238,8 +299,8 @@ int main()
         if (side == computer_side) // Computers Turn
         {
             // Find best move to react to current position
-           // MOVE    best_move = computer_think(max_depth); !IMPLEMENT LATER
-           // make_move(best_move);
+           MOVE    best_move = computer_think(max_depth);
+           make_move(best_move);
             continue ;
         }
         // Get user input 
@@ -256,6 +317,7 @@ int main()
             printf("Goodbye, thankyou for playing\n");
             return 0;
         }
+
         // now maybe the user has entered the move ? - parse values 
         // Extract source square
         from = user_input[0] - 'a'; //  - number between 0 - 7 / col 
@@ -271,8 +333,42 @@ int main()
         // Lets set ply to zero and generate all the moves 
         ply = 0;
         move_count = generate_all_moves(side, moveBuffer);
-
         printf("\n move_counts generated : %d\n", move_count);
-    }
 
+        // Loop through the moves to see if it is legal 
+        for (i = 0; i < move_count; i++)
+        {
+            if (moveBuffer[i].from == from && moveBuffer[i].dest == dest)
+            {
+                if (board[from] == PAWN && (dest < 8 || dest > 55)) // check for promotions 
+                {
+                    switch (user_input[4])
+                    {
+                        case 'q':
+                            moveBuffer[i].type = MOVE_TYPE_PROMOTION_TO_QUEEN;
+                            break;
+                        case 'r':
+                            moveBuffer[i].type = MOVE_TYPE_PROMOTION_TO_ROOK;
+                            break;
+                        case 'b':
+                            moveBuffer[i].type = MOVE_TYPE_PROMOTION_TO_BISHOP;
+                            break ;
+                        case 'n':
+                            moveBuffer[i].type = MOVE_TYPE_PROMOTION_TO_KNIGHT;
+                            break; 
+                        default :
+                            puts ("Default Promotion to Queen! \n");
+                            moveBuffer[i].type = MOVE_TYPE_PROMOTION_TO_QUEEN;
+                    }
+                }
+                if (!make_move(moveBuffer[i]))
+                {
+                    take_back();
+                    printf("Illegal move. Not allowed! \n");
+                }
+                break ;
+            }
+        }
+    }
+    return (0);
 }
