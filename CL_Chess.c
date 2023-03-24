@@ -187,6 +187,169 @@ int generate_all_moves(int current_side, MOVE *pBuf)
     return movecount;
 }
 
+// Check and return 1 if the current side is in check
+int is_in_check(int current_side)
+{
+    int         k, h, y, row, col, xside;
+
+    xside = (WHITE + BLACK) - current_side; // Opposite of current side whose check we need to work on
+
+    // First lets find  the King 
+    for (k = 0; k < 64; k++)
+    {
+        if (board[k] == KING && color[k] == current_side)
+            break ;
+    }
+    
+    row = ROW(k), col = COL(k);
+
+    // Check for attacks from knight 
+    if (col > 0 && row > 1 && color[k - 17] == xside && board[k - 17] == KNIGHT)
+        return 1;
+    if (col < 7 && row > 1 && color[k - 15] == xside && board[k - 15] == KNIGHT)
+        return 1;
+    if (col > 1 && row > 0 && color[k - 10] == xside && board[k - 10] == KNIGHT)
+        return 1;
+    if (col < 6 && row > 0 && color[k - 6] == xside && board[k - 6] == KNIGHT)
+        return 1;
+    if (col > 1 && row < 7 && color[k + 6] == xside && board[k + 6] == KNIGHT)
+        return 1;
+    if (col < 6 && row < 7 && color[k + 10] == xside && board[k + 10] == KNIGHT)
+        return 1;
+    if (col > 0 && row < 6 && color[k + 15] == xside && board[k + 15] == KNIGHT)
+        return 1;
+    if (col < 7 && row < 6 && color[k + 17] == xside && board[k + 17] == KNIGHT)
+        return 1;
+
+    // Check horizontal and vertical lines for attacking of Queen, Rook and King
+    y = k + 8;
+    if (y < 64) {
+        if (color[y] == xside && (board[y] == KING || board[y] == QUEEN || board[y] == ROOK))
+            return 1;
+        if (board[y] == EMPTY)
+            for (y += 8; y < 64; y += 8) {
+                if (color[y] == xside && (board[y] == QUEEN || board[y] == ROOK))
+                    return 1;
+                if (board[y] != EMPTY)
+                    break;
+
+            }
+    }
+    // go left 
+    y = k - 1;
+    h = k - col;
+    if (y >= h) {
+        if (color[y] == xside && (board[y] == KING || board[y] == QUEEN || board[y] == ROOK))
+            return 1;
+        if (board[y] == EMPTY)
+            for (y--; y >= h; y--) {
+                if (color[y] == xside && (board[y] == QUEEN || board[y] == ROOK))
+                    return 1;
+                if (board[y] != EMPTY)
+                    break;
+            }
+    }
+    // go right
+    y = k + 1;
+    h = k - col + 7;
+    if (y <= h) {
+        if (color[y] == xside && (board[y] == KING || board[y] == QUEEN || board[y] == ROOK))
+            return 1;
+        if (board[y] == EMPTY)
+            for (y++; y <= h; y++) {
+                if (color[y] == xside && (board[y] == QUEEN || board[y] == ROOK))
+                    return 1;
+                if (board[y] != EMPTY)
+                    break;
+            }
+    }
+    // go up 
+    y = k - 8;
+    if (y >= 0) {
+        if (color[y] == xside && (board[y] == KING || board[y] == QUEEN || board[y] == ROOK))
+            return 1;
+        if (board[y] == EMPTY)
+            for (y -= 8; y >= 0; y -= 8) {
+                if (color[y] == xside && (board[y] == QUEEN || board[y] == ROOK))
+                    return 1;
+                if (board[y] != EMPTY)
+                    break;
+            }
+    }
+    /* Check diagonal lines for attacking of Queen, Bishop, King, Pawn */
+    // go right down
+    y = k + 9;
+    if (y < 64 && COL(y) != 0) {
+        if (color[y] == xside) {
+            if (board[y] == KING || board[y] == QUEEN || board[y] == BISHOP)
+                return 1;
+            if (current_side == BLACK && board[y] == PAWN)
+                return 1;
+        }
+        if (board[y] == EMPTY)
+            for (y += 9; y < 64 && COL(y) != 0; y += 9) {
+                if (color[y] == xside && (board[y] == QUEEN || board[y] == BISHOP))
+                    return 1;
+                if (board[y] != EMPTY)
+                    break;
+            }
+    }
+    // go left down
+    y = k + 7;
+    if (y < 64 && COL(y) != 7) {
+        if (color[y] == xside) {
+            if (board[y] == KING || board[y] == QUEEN || board[y] == BISHOP)
+                return 1;
+            if (current_side == BLACK && board[y] == PAWN)
+                return 1;
+        }
+        if (board[y] == EMPTY)
+            for (y += 7; y < 64 && COL(y) != 7; y += 7) {
+                if (color[y] == xside && (board[y] == QUEEN || board[y] == BISHOP))
+                    return 1;
+                if (board[y] != EMPTY)
+                    break;
+
+            }
+    }
+    // go left up 
+    y = k - 9;
+    if (y >= 0 && COL(y) != 7) {
+        if (color[y] == xside) {
+            if (board[y] == KING || board[y] == QUEEN || board[y] == BISHOP)
+                return 1;
+            if (current_side == WHITE && board[y] == PAWN)
+                return 1;
+        }
+        if (board[y] == EMPTY)
+            for (y -= 9; y >= 0 && COL(y) != 7; y -= 9) {
+                if (color[y] == xside && (board[y] == QUEEN || board[y] == BISHOP))
+                    return 1;
+                if (board[y] != EMPTY)
+                    break;
+
+            }
+    }
+    // go right up
+    y = k - 7;
+    if (y >= 0 && COL(y) != 0) {
+        if (color[y] == xside) {
+            if (board[y] == KING || board[y] == QUEEN || board[y] == BISHOP)
+                return 1;
+            if (current_side == WHITE && board[y] == PAWN)
+                return 1;
+        }
+        if (board[y] == EMPTY)
+            for (y -= 7; y >= 0 && COL(y) != 0; y -= 7) {
+                if (color[y] == xside && (board[y] == QUEEN || board[y] == BISHOP))
+                    return 1;
+                if (board[y] != EMPTY)
+                    break;
+            }
+    }
+    return 0;
+}
+
 // Main - Brain function. I guess
 int eval()
 {
