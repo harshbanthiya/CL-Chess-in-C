@@ -1,2 +1,2 @@
 # CL-Chess-in-C
-Make first attempt to make a Chess, as simply as I can in C
+My first attempt to make Command Line Chess, as simply as I can in C
