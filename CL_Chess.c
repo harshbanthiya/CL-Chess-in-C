@@ -544,7 +544,7 @@ int main()
     int     move_count;
 
     printf("CL-Chess by HB\n");
-    printf("\n type D: to print board on screen\n to move type move string (e.g. b1c3, a7a8q)\n to quit type: exit\n");
+    printf("\n type D: to print board on screen\n type move (e.g. b1c3): to make move \n type move with promotion piece (eg. a7a8q): will promote to queen (other choices: q,r,k,b) \n type exit: to quit\n");
 
     side = WHITE;
     computer_side = BLACK;
