@@ -26,3 +26,8 @@ git clone https://github.com/harshbanthiya/CL-Chess-in-C.git ; cd CL-Chess-in-C 
 ```sh
 > a7a8q
 ```
+
+### To Quit
+```sh
+> exit
+```
