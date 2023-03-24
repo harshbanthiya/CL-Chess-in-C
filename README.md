@@ -1,5 +1,7 @@
 # CL-Chess-in-C
 My first attempt to make Command Line Chess, as simply as I can in C. Does not handle castling or en passant
+![alt text](https://github.com/harshbanthiya/CL-Chess-in-C/blob/main/imgs/cl-chess2.png?raw=true)
+![alt text](https://github.com/harshbanthiya/CL-Chess-in-C/blob/main/imgs/cl-chess1.png?raw=true)
 
 ## USAGE
 ```sh
