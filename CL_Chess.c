@@ -448,7 +448,7 @@ int search(int alpha, int beta, int depth, MOVE *pBestMove)
     move_count = generate_all_moves(side, moveBuffer); // Generate all moves from current position
 
     // Loop through the moves 
-    for (i = 0; i < move_count; i++)
+    for (i = 0; i < move_count; ++i)
     {
         if (!make_move(moveBuffer[i]))
         {
@@ -515,7 +515,7 @@ void print_board(void)
     char    pieceNames[] = "PNBRQKpnbrqk";
     int     i = 0;
 
-    while (i < 64)
+    for (i = 0; i < 64; i++)
     {
         if ((i & 7) == 0) // if i is a multiple of 8 we have print a separating line
         {
@@ -531,7 +531,6 @@ void print_board(void)
             printf(" %c |", pieceNames[board[i] + (color[i] == WHITE ? 0 : 6)]);
         if ((i & 7) == 7)
             printf("\n");
-        i++;
     }
    printf("   +---+---+---+---+---+---+---+---+\n     a   b   c   d   e   f   g   h\n");
 }
@@ -548,6 +547,8 @@ int main()
 
     side = WHITE;
     computer_side = BLACK;
+    max_depth = 5;
+    hdp = 0;
     init_board();
     for (;;)
     {
