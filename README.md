@@ -31,3 +31,8 @@ git clone https://github.com/harshbanthiya/CL-Chess-in-C.git ; cd CL-Chess-in-C 
 ```sh
 > exit
 ```
+
+
+<a href = "url"><img src="https://github.com/harshbanthiya/CL-Chess-in-C/blob/main/imgs/cl-chess2.png"></a>
+<a href = "url"><img src="https://github.com/harshbanthiya/CL-Chess-in-C/blob/main/imgs/cl-chess1.png"></a>
+
