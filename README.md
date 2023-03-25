@@ -1,5 +1,6 @@
 # CL-Chess-in-C
 My first attempt to make Command Line Chess, as simply as I can in C. Does not handle castling or en passant
+### CURRENTLY YOU CAN PRESUME YOU CHECKMATED / STALEMATED THE COMPUTER IF THE SCORE DISPLAYED IS -10000
 
 ## USAGE
 ```sh
